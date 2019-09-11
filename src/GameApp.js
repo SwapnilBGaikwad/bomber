@@ -4,8 +4,12 @@ import GameCanvas from "./GameCanvas";
 class GameApp extends React.Component {
     constructor(props) {
         super(props);
-        this.height = 10;
-        this.width = 18;
+        this.height = 600;
+        this.width = 1080;
+        this.radius = 10;
+        let diameter = (2 * this.radius);
+        this.h = this.height / diameter;
+        this.w = this.width / diameter;
         this.xFactor = 1;
         this.yFactor = 1;
         this.state = {x: 1, y: 1}
@@ -17,17 +21,18 @@ class GameApp extends React.Component {
                 x: this.getNextX(this.state.x), y: this.getNextY(this.state.y)
             });
         }, 100);
+
     }
 
     getNextX(x) {
-        if (x === this.width - 1 || x === 0) {
+        if (x === this.w - 1 || x === 0) {
             this.xFactor = -1 * this.xFactor;
         }
         return x + this.xFactor;
     }
 
     getNextY(y) {
-        if (y === this.height - 1 || y === 0) {
+        if (y === this.h - 1 || y === 0) {
             this.yFactor = -1 * this.yFactor;
         }
         return y + this.yFactor;
@@ -36,7 +41,7 @@ class GameApp extends React.Component {
     render() {
         let {x, y} = this.state;
         return (
-            <GameCanvas height={600} width={1080} x={x} y={y}/>
+            <GameCanvas height={this.height} width={this.width} x={x} y={y} radius={this.radius}/>
         );
     }
 }
