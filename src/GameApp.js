@@ -7,21 +7,34 @@ class GameApp extends React.Component {
         this.height = 600;
         this.width = 1080;
         this.radius = 10;
-        let diameter = (2 * this.radius);
-        this.h = this.height / diameter;
-        this.w = this.width / diameter;
+        this.h = this.height / 2 - this.radius;
+        this.w = this.width / 2 - this.radius;
         this.xFactor = 1;
         this.yFactor = 1;
-        this.state = {x: 1, y: 1}
+        this.state = {x: 1, y: 1};
+        this.oldTimeStamp = 0;
     }
 
     componentDidMount() {
-        setInterval(() => {
-            this.setState({
-                x: this.getNextX(this.state.x), y: this.getNextY(this.state.y)
-            });
-        }, 100);
+        window.requestAnimationFrame(this.loop.bind(this));
+    }
 
+    loop(timeStamp) {
+        window.requestAnimationFrame(this.loop.bind(this));
+        let secondsPassed = (timeStamp - this.oldTimeStamp) / 1000;
+        console.log("timeStamp " + timeStamp);
+        console.log("oldTimeStamp " + this.oldTimeStamp);
+        console.log("Diff " + secondsPassed);
+        if(secondsPassed >= 0.01) {
+            this.renderState();
+            this.oldTimeStamp = timeStamp;
+        }
+    }
+
+    renderState() {
+        this.setState({
+            x: this.getNextX(this.state.x), y: this.getNextY(this.state.y)
+        });
     }
 
     getNextX(x) {
