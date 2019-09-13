@@ -1,5 +1,6 @@
 import React from 'react'
 import GameCanvas from "./GameCanvas";
+import ScoreBoard from "./ScoreBoard";
 
 class GameApp extends React.Component {
     constructor(props) {
@@ -11,29 +12,61 @@ class GameApp extends React.Component {
         this.w = this.width / 2 - this.radius;
         this.xFactor = 1;
         this.yFactor = 1;
-        this.state = {x: 1, y: 1};
+        this.state = {x: 20, y: 20, bar: 0, score: 0};
         this.oldTimeStamp = 0;
+        this.gameOver = false;
     }
 
     componentDidMount() {
+        document.onkeydown = this.keyPressed.bind(this);
         window.requestAnimationFrame(this.loop.bind(this));
     }
 
     loop(timeStamp) {
+        if (this.gameOver) {
+            return;
+        }
         window.requestAnimationFrame(this.loop.bind(this));
         let secondsPassed = (timeStamp - this.oldTimeStamp) / 1000;
-        console.log("timeStamp " + timeStamp);
-        console.log("oldTimeStamp " + this.oldTimeStamp);
-        console.log("Diff " + secondsPassed);
-        if(secondsPassed >= 0.01) {
-            this.renderState();
+        if (secondsPassed >= 0.01) {
+            this.renderCircleState();
             this.oldTimeStamp = timeStamp;
         }
     }
 
-    renderState() {
+    keyPressed(event) {
+        event = event || window.event;
+        event.preventDefault();
+        if (event.keyCode === 37) {
+            this.setState({
+                bar: this.state.bar - 8
+            });
+            return;
+        }
+        if (event.keyCode === 39) {
+            this.setState({
+                bar: this.state.bar + 8
+            });
+        }
+    }
+
+    renderCircleState() {
+        if (this.state.y === 0) {
+            this.gameOver = true;
+            alert("Game over :(");
+            return
+        }
+        let {x, y, bar} = this.state;
+        if (this.isScore(x, y, bar)) {
+            console.log('Increase score');
+            this.setState({
+                score: this.state.score + 1
+            });
+            this.yFactor = -1 * this.yFactor;
+        }
         this.setState({
-            x: this.getNextX(this.state.x), y: this.getNextY(this.state.y)
+            x: this.getNextX(this.state.x),
+            y: this.getNextY(this.state.y)
         });
     }
 
@@ -51,10 +84,19 @@ class GameApp extends React.Component {
         return y + this.yFactor;
     }
 
+    isScore(x, y, bar) {
+        x = this.radius + 2 * (x - this.radius / 2);
+        y = this.height - this.radius - 2 * (y - this.radius / 2);
+        return x >= bar && x <= (bar + 100) && y === (this.height - 20);
+    }
+
     render() {
-        let {x, y} = this.state;
+        let {x, y, bar} = this.state;
         return (
-            <GameCanvas height={this.height} width={this.width} x={x} y={y} radius={this.radius}/>
+            <div>
+                <GameCanvas height={this.height} width={this.width} x={x} y={y} radius={this.radius} barPosition={bar}/>
+                <ScoreBoard score={this.state.score} width={500} height={this.height}/>
+            </div>
         );
     }
 }

@@ -3,14 +3,18 @@ import React from 'react'
 class GameCanvas extends React.Component {
 
     componentDidMount() {
-        document.onkeydown = this.keyPressed.bind(this);
-        this.barPosition = 0;
+        this.barPosition = {
+            x: this.props.barPosition, y: this.props.height - 20
+        };
         this.renderBar(true,false);
     }
 
     componentDidUpdate() {
         let {x, y} = this.props;
         this.drawCircle(x, y);
+        this.barPosition = {
+            x: this.props.barPosition, y: this.props.height - 20
+        };
     }
 
     drawCircle(x, y) {
@@ -31,26 +35,13 @@ class GameCanvas extends React.Component {
         let ctx = canvas.getContext("2d");
         if (move) {
             if (left) {
-                this.barPosition -= 8;
+                this.barPosition.x -= 8;
             } else {
-                this.barPosition += 8;
+                this.barPosition.x += 8;
             }
         }
-        ctx.fillRect(this.barPosition, this.props.height - 20, width, height);
-    }
-
-    keyPressed(event) {
-        event = event || window.event;
-        event.preventDefault();
-        if (event.keyCode === 37) {
-            console.log('left');
-            this.renderBar(true, true);
-            return;
-        }
-        if (event.keyCode === 39) {
-            console.log('right');
-            this.renderBar(false, true);
-        }
+        let {x,y} = this.barPosition;
+        ctx.fillRect(x, y, width, height);
     }
 
     render() {
